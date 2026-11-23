@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spsdk-security-regression-lab"
+version = "0.1.0"
+description = "Hardware-free regression tests for the cryptographic workflows of NXP SPSDK's nxpcrypto CLI."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Joun Mikhail" }]
+requires-python = ">=3.12"
+dependencies = [
+    "spsdk==3.13.0",
+    "cryptography==49.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.2.0",
+    "ruff==0.17.6",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "negative: security-negative test that expects a rejection or error",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "PT", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# assert is the pytest idiom; subprocess use is reviewed (argument lists, no shell).
+"tests/*" = ["S101"]
+"src/spsdk_regression/cli_runner.py" = ["S603"]
