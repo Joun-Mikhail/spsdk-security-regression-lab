@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="t d">
+  <title id="t">SPSDK Security Regression Lab: system overview</title>
+  <desc id="d">The pytest suite drives the real nxpcrypto executable from SPSDK 3.13.0 through a CLI runner. The command results go to a verdict classifier (ACCEPTED, REJECTED or ERROR) and to a secondary verification path using Python cryptography and hashlib. Both feed the pytest assertions, which GitHub Actions runs on every push and pull request. Everything is host-side: no microcontroller is involved.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8ba3c7"/>
+    </marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#16213a" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <style>
+    .h{font:700 13px 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:2.5px;fill:#4da3ff}
+    .sub{font:400 15px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#9fb0c8}
+    .bt{font:600 15px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#e6edf3}
+    .bs{font:400 12.5px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#9fb0c8}
+    .mono{font:500 12px 'SFMono-Regular',Consolas,'DejaVu Sans Mono',monospace;fill:#7f93b2}
+    .lab{font:700 10.5px 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:1.8px}
+    .chip{font:700 11px 'SFMono-Regular',Consolas,'DejaVu Sans Mono',monospace}
+    .ft{font:400 12.5px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#6f819c}
+    .ln{stroke:#8ba3c7;stroke-width:1.6;fill:none}
+  </style>
+
+  <rect width="1280" height="470" rx="14" fill="url(#bg)"/>
+  <rect width="1280" height="470" rx="14" fill="url(#grid)" opacity="0.55"/>
+
+  <text x="40" y="44" class="h">SPSDK SECURITY REGRESSION LAB</text>
+  <text x="40" y="70" class="sub">Host-side regression tests for the real nxpcrypto CLI: ECDSA P-256 signing, tamper detection, SHA-256 digests</text>
+
+  <!-- Region labels -->
+  <text x="40" y="128" class="lab" fill="#4da3ff">A · REGRESSION FRAMEWORK</text>
+  <text x="432" y="128" class="lab" fill="#a0aec0">B · SYSTEM UNDER TEST (EXTERNAL)</text>
+  <text x="850" y="128" class="lab" fill="#2dd4bf">C · VERDICT + SECONDARY CHECK</text>
+
+  <!-- 1. pytest suite -->
+  <rect x="40" y="200" width="165" height="100" rx="10" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="56" y="232" class="bt">pytest suite</text>
+  <text x="56" y="256" class="bs">28 tests · 12 scenarios</text>
+  <text x="56" y="280" class="mono">tests/ + conftest.py</text>
+
+  <!-- 2. CLI runner -->
+  <rect x="240" y="200" width="165" height="100" rx="10" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="256" y="232" class="bt">CLI runner</text>
+  <text x="256" y="256" class="bs">arg list · timeout</text>
+  <text x="256" y="280" class="mono">cli_runner.py</text>
+
+  <!-- 3. SUT boundary -->
+  <rect x="432" y="160" width="200" height="180" rx="12" fill="none" stroke="#56657d" stroke-width="1.4" stroke-dasharray="6 5"/>
+  <rect x="448" y="200" width="168" height="100" rx="10" fill="#161f2e" stroke="#a0aec0" stroke-width="1.6"/>
+  <text x="464" y="232" class="bt">nxpcrypto</text>
+  <text x="464" y="256" class="bs">NXP SPSDK 3.13.0 (PyPI)</text>
+  <text x="464" y="280" class="mono">real executable</text>
+
+  <!-- 4. outputs -->
+  <rect x="660" y="200" width="160" height="100" rx="10" fill="#0f1d33" stroke="#56657d" stroke-width="1.4"/>
+  <text x="676" y="232" class="bt">Command result</text>
+  <text x="676" y="256" class="bs">exit code · stdout · files</text>
+  <text x="676" y="280" class="mono">signature · keys</text>
+
+  <!-- 5a. classifier -->
+  <rect x="850" y="146" width="190" height="104" rx="10" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="866" y="176" class="bt">Verdict classifier</text>
+  <text x="866" y="198" class="mono">diagnostics.py</text>
+  <rect x="862" y="214" width="62" height="22" rx="11" fill="#0f2e22" stroke="#3fd47f"/>
+  <text x="893" y="229" class="chip" fill="#3fd47f" text-anchor="middle">ACCEPT</text>
+  <rect x="930" y="214" width="62" height="22" rx="11" fill="#341618" stroke="#ff6b6b"/>
+  <text x="961" y="229" class="chip" fill="#ff6b6b" text-anchor="middle">REJECT</text>
+  <rect x="998" y="214" width="36" height="22" rx="11" fill="#33270e" stroke="#f5b942"/>
+  <text x="1016" y="229" class="chip" fill="#f5b942" text-anchor="middle">ERR</text>
+
+  <!-- 5b. oracle -->
+  <rect x="850" y="272" width="190" height="84" rx="10" fill="#0c2426" stroke="#2dd4bf" stroke-width="1.6"/>
+  <text x="866" y="302" class="bt">Secondary verification</text>
+  <text x="866" y="324" class="bs">cryptography · hashlib</text>
+  <text x="866" y="344" class="mono">oracle.py</text>
+
+  <!-- 6. assertions -->
+  <rect x="1075" y="200" width="165" height="100" rx="10" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="1091" y="232" class="bt">pytest assertions</text>
+  <text x="1091" y="256" class="bs">expected verdict +</text>
+  <text x="1091" y="276" class="bs">oracle must agree</text>
+
+  <!-- arrows -->
+  <path d="M205 250 H236" class="ln" marker-end="url(#a)"/>
+  <path d="M405 250 H444" class="ln" marker-end="url(#a)"/>
+  <path d="M616 250 H656" class="ln" marker-end="url(#a)"/>
+  <path d="M820 236 C835 236 835 198 846 198" class="ln" marker-end="url(#a)"/>
+  <path d="M820 264 C835 264 835 314 846 314" class="ln" marker-end="url(#a)"/>
+  <path d="M1040 198 C1058 198 1056 236 1071 236" class="ln" marker-end="url(#a)"/>
+  <path d="M1040 314 C1058 314 1056 264 1071 264" class="ln" marker-end="url(#a)"/>
+
+  <!-- 7. CI band -->
+  <path d="M1157 300 V372" class="ln" marker-end="url(#a)"/>
+  <rect x="40" y="376" width="1200" height="44" rx="10" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.2" stroke-opacity="0.7"/>
+  <text x="58" y="403" class="lab" fill="#4da3ff">D · CI</text>
+  <text x="120" y="403" class="bs" fill="#c9d4e5">GitHub Actions on every push and pull request: Ruff lint → Ruff format → pytest (JUnit XML artifact) → end-to-end demo</text>
+
+  <text x="40" y="450" class="ft">Host-side only: synthetic firmware bytes, no microcontroller, no boot ROM. Independent educational project, not affiliated with NXP Semiconductors.</text>
+</svg>
