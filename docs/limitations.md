@@ -17,9 +17,12 @@ results with that scope in mind.
 - **Not a security audit or certification of SPSDK.** Passing tests show that specific expected
   behaviours hold. They do not show the absence of vulnerabilities.
 - **Verified environments only.** Executed on Linux x86_64 with Python 3.12.3 and SPSDK 3.13.0
-  locally, plus the GitHub Actions `ubuntu-latest` runner with Python 3.12. The code uses
-  `pathlib` and looks for `nxpcrypto.exe` on Windows, but **Windows has not been executed** as
-  part of this delivery.
+  locally, plus the GitHub Actions `ubuntu-latest` runner with Python 3.12. **Windows was
+  verified by hand** by the project author: a fresh clone in Windows PowerShell 5.1 with
+  Python 3.12.10 (`win32`), pytest 9.2.0 and SPSDK 3.13.0 gave 28 passed in 63.12 s, and
+  `scripts/demo.py` showed the original firmware `ACCEPTED`, the modified firmware `REJECTED` and
+  agreement from the secondary check. Windows is not part of CI, so later changes are only
+  verified automatically on Linux. macOS has not been executed.
 - **SPSDK debug log.** `nxpcrypto` writes its own debug log to the user's state directory (for
   example `~/.local/state/spsdk/3.13.0/log/debug.log` on Linux), outside the repository. A review
   of that log after a full run found no key material, only file paths and error tracebacks.

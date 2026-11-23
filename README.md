@@ -231,7 +231,7 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-**Windows PowerShell** (written for Windows but not yet executed there)
+**Windows PowerShell** (verified by hand: 28 passed, demo passed)
 
 ```powershell
 git clone https://github.com/Joun-Mikhail/spsdk-security-regression-lab.git
@@ -260,7 +260,8 @@ python scripts/demo.py                             # end-to-end demonstration
   provisioning, and the synthetic firmware is never executed.
 - **Narrow scope.** Only P-256, SHA-256 and DER encoding are covered. Real SPSDK image formats
   (MBI, AHAB, HAB) are not.
-- **Verified environments.** Linux locally and in GitHub Actions. Windows has not been executed.
+- **Verified environments.** Linux locally and in GitHub Actions (automated), and Windows with
+  PowerShell 5.1 and Python 3.12.10 (run by hand, not part of CI). macOS is untested.
 - **Not an audit.** This is not a security assessment or certification of SPSDK.
 
 The full list is in [docs/limitations.md](docs/limitations.md).
