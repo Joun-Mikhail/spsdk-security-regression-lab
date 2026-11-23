@@ -15,35 +15,134 @@
 
 </div>
 
-| | |
-|---|---|
-| **What it is** | A pytest suite that drives the real `nxpcrypto` command-line tool and checks every answer it gives. |
-| **What it tests** | [NXP SPSDK](https://github.com/nxp-mcuxpresso/spsdk) 3.13.0, installed from PyPI and never mocked: ECC P-256 key generation, ECDSA/SHA-256 signing, signature verification and SHA-256 digests. |
-| **Security behaviour validated** | Valid signatures are accepted. Tampered firmware, a wrong public key, corrupted or truncated signatures, malformed keys and wrong digests are rejected. |
-| **Proof** | 28 of 28 tests pass in CI on every push. A deliberate harness defect made 7 tests fail. All screenshots below come from real runs. |
+## In 30 seconds
+
+**The problem.** Before a car's control unit, a medical device or a smart meter runs new
+software, its chip checks a **digital signature**: a tamper-evident seal that proves the
+software is genuine and has not been changed. NXP's open-source toolkit, SPSDK, is used by
+engineers to create and check those seals.
+
+**What I built.** An automated test lab that drives SPSDK's real crypto tool and confirms two
+things every time the code changes:
+
+- ✅ **Genuine firmware is accepted.**
+- ❌ **Anything altered is rejected:** a single changed byte, the wrong key, a damaged or
+  shortened signature, a corrupted key file, or a wrong checksum.
+
+**Why it is interesting.** While building it I found that SPSDK 3.13.0 reports *"success"* (exit
+code 0) even when it rejects a fake signature, so a naive automated test could be fooled. The lab
+reads the tool's actual verdict instead, and a deliberately planted bug showed that it catches
+real mistakes (see [Results](#results-at-a-glance)).
 
 > Independent educational portfolio project. It is not an official NXP project and is not
 > affiliated with or endorsed by NXP Semiconductors.
 
-## Overview
+## Results at a glance
 
-Secure boot relies on signing tools that get two things right. Valid firmware must verify, and
-anything modified must not. A regression in either direction is a security bug. This lab pins
-down both directions for SPSDK's `nxpcrypto` tool. It cross-checks the results with a separate
-verification path and runs everything automatically in GitHub Actions.
+| | Result |
+|---|---|
+| 🧪 Automated tests | **28 of 28 pass**, including **15 negative security tests** |
+| 🐧 Linux and GitHub Actions | Pass on every change, checked automatically |
+| 🪟 Windows | **28 of 28 pass** and the demo passes (Python 3.12.10, run by hand) |
+| 🎯 Does it catch bugs? | Yes. A deliberately planted bug made **7 tests fail** straight away |
+| 🔍 Second opinion | Every signature is re-checked with a separate Python library |
+| 🔧 Hardware needed | None. Everything runs on an ordinary laptop or CI server |
 
-## Quick demonstration
+## See it in action
 
-```bash
-python scripts/demo.py
-```
+Every screenshot below is real output from commands that were actually run. The raw text is
+linked under each image.
 
-<img src="assets/screenshots/firmware-demo.png" alt="Real terminal output of scripts/demo.py: test keys generated, 4 KiB firmware signed (70-byte DER signature), original firmware ACCEPTED by SPSDK, one byte modified, modified firmware REJECTED, and the Python cryptography check agreeing (original ACCEPTED, modified REJECTED)." width="760">
+### 1. The full story in one command
 
-<sub>Real output of <code>python scripts/demo.py</code> on Linux, Python 3.12.3, SPSDK 3.13.0
-(<a href="assets/screenshots/firmware-demo.txt">raw text</a>). Each ACCEPTED/REJECTED word is
-derived from the actual CLI result. The DER signature length varies from run to run because
-ECDSA uses a random nonce.</sub>
+<img src="assets/screenshots/firmware-demo.png" alt="Real terminal output of scripts/demo.py: test keys generated, 4 KiB firmware signed, original firmware ACCEPTED by SPSDK, one byte modified, modified firmware REJECTED, and the Python cryptography check agreeing (original ACCEPTED, modified REJECTED)." width="760">
+
+<sub>Create keys, sign a firmware file, check it (accepted), change one byte, check again
+(rejected). <code>python scripts/demo.py</code> on Linux, Python 3.12.3, SPSDK 3.13.0
+(<a href="assets/screenshots/firmware-demo.txt">raw text</a>).</sub>
+
+### 2. One changed byte is enough to be caught
+
+<img src="assets/screenshots/tamper-detection.png" alt="Real nxpcrypto session: a key pair is generated, a 4 KiB firmware file is signed, verification prints 'Signature IS matching the public key.' with exit code 0, one byte at offset 256 is flipped, and verification of the tampered file prints 'Signature IS NOT matching the public key.' also with exit code 0." width="100%">
+
+<sub>The same tool, called directly. Green means accepted, red means rejected. Note that
+<b>both</b> checks end with <code>exit code: 0</code>: this is the finding explained
+<a href="#the-key-finding">below</a>. The yellow WARNING line is SPSDK's own log message and
+does not affect the result (<a href="assets/screenshots/tamper-detection.txt">raw text</a>).</sub>
+
+### 3. The wrong key is refused
+
+<img src="assets/screenshots/wrong-key.png" alt="Real nxpcrypto session: a second, unrelated key pair is generated, and verifying the original firmware signature with that unrelated public key prints 'Signature IS NOT matching the public key.' with exit code 0." width="100%">
+
+<sub>A genuine signature checked against someone else's key is rejected, just as a seal from the
+wrong manufacturer would be (<a href="assets/screenshots/wrong-key.txt">raw text</a>).</sub>
+
+### 4. Checksums catch a single wrong character
+
+<img src="assets/screenshots/digest-check.png" alt="Real nxpcrypto digest session: the SHA-256 digest of firmware.bin is printed, comparing it with the correct reference prints 'Digests are the same.' with exit code 0, and comparing it with a reference that differs in the first character prints 'SPSDKAppError: Digests differ!' with exit code 1." width="100%">
+
+<sub>A SHA-256 checksum is a fingerprint of the file. The correct fingerprint matches, and one
+wrong character is reported (<a href="assets/screenshots/digest-check.txt">raw text</a>).</sub>
+
+### 5. All 15 negative security tests pass
+
+<img src="assets/screenshots/negative-tests.png" alt="Real pytest run of the negative marker: 15 security-negative tests selected (malformed keys, missing files, wrong digests, tampered firmware, wrong public key, corrupted and truncated signatures, and the harness guard test), all PASSED, summary 15 passed, 13 deselected." width="100%">
+
+<sub><code>python -m pytest -m negative -v</code> on Linux. Fourteen tests each try one way to
+break the security check and pass only if SPSDK rejects it. The fifteenth checks that the test
+harness itself never mistakes an error for a rejection
+(<a href="assets/screenshots/negative-tests.txt">raw text</a>).</sub>
+
+### 6. It also runs on Windows
+
+<img src="assets/screenshots/windows-run.png" alt="Windows PowerShell output from the project author's own machine: pytest on win32 with Python 3.12.10, pytest 9.2.0 and nxpcrypto 3.13.0 collected 28 items and reported 28 passed in 63.12s, then scripts\demo.py showed the original firmware ACCEPTED, the modified firmware REJECTED and the Python cryptography check agreeing." width="100%">
+
+<sub>Output from a manual run on the author's Windows PC, copied from the terminal and rendered
+here as an image (<a href="assets/screenshots/windows-run.txt">raw text</a>). Windows is not part
+of the automated CI.</sub>
+
+## Skills demonstrated
+
+| Skill | Where it shows |
+|---|---|
+| Python test automation | A pytest framework with fixtures, parametrised tests and markers |
+| Security and negative testing | 15 tests that try to break the signature check and must be rejected |
+| Test design and reliability | Positive controls and a three-way verdict, so a broken test can never pass by accident |
+| Cryptography fundamentals | ECDSA P-256 signatures, SHA-256 digests, public and private keys |
+| CI/CD | GitHub Actions runs linting, tests and the demo on every change |
+| Debugging vendor tools | Found and documented SPSDK's exit-code behaviour |
+| Technical writing | Test plan, traceability matrix, architecture notes and limitations |
+
+## The key finding
+
+<img src="assets/diagrams/verdict-classification.svg" alt="Verdict classification flowchart: a non-zero exit code is ERROR. With exit code 0, the exact line 'Signature IS matching the public key.' is ACCEPTED, 'Signature IS NOT matching the public key.' is REJECTED, and anything else is ERROR. A negative test passes only on REJECTED. ACCEPTED is a security failure, and ERROR is a setup failure that never counts as a rejection." width="100%">
+
+**In plain words:** most automated tools signal "it worked" with exit code 0 and "it failed" with
+anything else. In SPSDK 3.13.0, `nxpcrypto signature verify` returns 0 **both** when a signature
+is valid and when it is fake (screenshot 2 above). Only the printed sentence tells them apart. A
+test that trusted the exit code would wave a forged signature through, and a test that expected
+"any failure" would also pass on a simple typo.
+
+**What the lab does about it:** [`diagnostics.py`](src/spsdk_regression/diagnostics.py) reads
+the exact verdict sentence and sorts every result into `ACCEPTED`, `REJECTED` or `ERROR`. A
+security test passes only on a real `REJECTED`, never on an `ERROR`. The guard test
+`test_harness_never_counts_usage_errors_as_rejections` locks this in. This is recorded as
+version-specific observed behaviour, not reported as an SPSDK vulnerability.
+
+---
+
+# Technical details
+
+The rest of this page is for engineers who want to see how it works.
+
+## What it tests
+
+| | |
+|---|---|
+| **System under test** | [NXP SPSDK](https://github.com/nxp-mcuxpresso/spsdk) 3.13.0 `nxpcrypto`, installed from PyPI and never mocked |
+| **Operations** | ECC P-256 key generation, ECDSA/SHA-256 signing, signature verification, SHA-256 digests |
+| **Security behaviour validated** | Valid signatures are accepted. Tampered firmware, a wrong public key, corrupted or truncated signatures, malformed keys and wrong digests are rejected |
+| **Evidence** | 28 of 28 tests pass in CI on every push; a deliberate harness defect made 7 tests fail |
 
 ## Key engineering capabilities
 
@@ -112,20 +211,6 @@ The framework never touches hardware. SPSDK runs as an ordinary host program, an
 is synthetic bytes in a temporary directory. Component details:
 [docs/architecture.md](docs/architecture.md).
 
-## Main technical finding
-
-<img src="assets/diagrams/verdict-classification.svg" alt="Verdict classification flowchart: a non-zero exit code is ERROR. With exit code 0, the exact line 'Signature IS matching the public key.' is ACCEPTED, 'Signature IS NOT matching the public key.' is REJECTED, and anything else is ERROR. A negative test passes only on REJECTED. ACCEPTED is a security failure, and ERROR is a setup failure that never counts as a rejection." width="100%">
-
-In SPSDK 3.13.0, `nxpcrypto signature verify` **exits with code 0 for both valid and invalid
-signatures**. Only the stdout text carries the verdict. A test that trusted the exit code would
-accept a forged signature. A negative test that only expected "some failure" would pass on a
-typo in a file path.
-
-[`diagnostics.py`](src/spsdk_regression/diagnostics.py) therefore classifies the exact verdict
-line and treats everything unexpected as `ERROR`. The guard test
-`test_harness_never_counts_usage_errors_as_rejections` locks this in. This is recorded as
-version-specific observed behaviour, not reported as an SPSDK vulnerability.
-
 ## Cryptographic verification flow
 
 ```mermaid
@@ -188,8 +273,8 @@ The full plan with setup, actions and executed results is in
 
 <img src="assets/screenshots/pytest-results.png" alt="Real pytest -v output: 28 items collected, every test from CRYPTO-001 to CRYPTO-012 plus edge cases PASSED, final summary 28 passed in 25.14s, on Linux with Python 3.12.3, pytest 9.2.0 and nxpcrypto 3.13.0." width="100%">
 
-<sub>Real local run, 2026-11-23 (<a href="assets/screenshots/pytest-results.txt">raw text</a>):
-28 collected, 28 passed, 0 failed, 0 skipped.</sub>
+<sub>Real local run on Linux, 2026-11-23 (<a href="assets/screenshots/pytest-results.txt">raw
+text</a>): 28 collected, 28 passed, 0 failed, 0 skipped.</sub>
 
 **Regression detection.** When the classifier was deliberately made to accept every verdict,
 7 negative tests failed (CRYPTO-004 to 007). When it was made to count errors as rejections, the

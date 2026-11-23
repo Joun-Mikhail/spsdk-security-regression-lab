@@ -1,0 +1,5 @@
+$ nxpcrypto key generate -k secp256r1 -o other.pem
+The key pair has been created: other.pub, other.pem
+$ nxpcrypto signature verify -k other.pub -a sha256 -i firmware.bin -s firmware.der
+Signature IS NOT matching the public key.
+exit code: 0
