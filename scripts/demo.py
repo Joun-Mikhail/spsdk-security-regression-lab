@@ -64,9 +64,9 @@ def run(workdir: Path) -> None:
     )
 
     if original is not Verdict.ACCEPTED or not oracle_ok:
-        raise DemoFailure("valid signature was not accepted")
+        raise DemoFailure(f"valid signature not accepted (SPSDK verdict: {original.name})")
     if modified is not Verdict.REJECTED or oracle_tampered:
-        raise DemoFailure("tampered firmware was not rejected")
+        raise DemoFailure(f"tampered firmware not rejected (SPSDK verdict: {modified.name})")
 
 
 def main() -> int:

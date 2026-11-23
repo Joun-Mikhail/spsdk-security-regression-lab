@@ -99,6 +99,8 @@ def run_nxpcrypto(
     """
     exe = executable or locate_nxpcrypto()
     command = (str(exe), *(os.fspath(a) for a in args))
+    # Force UTF-8 output from the Python-based CLI so decoding is identical on Windows and Linux.
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
     start = time.perf_counter()
     try:
         completed = subprocess.run(
@@ -109,10 +111,13 @@ def run_nxpcrypto(
             errors="replace",
             timeout=timeout_s,
             cwd=cwd,
+            env=env,
             check=False,
         )
     except FileNotFoundError as exc:
         raise ExecutableNotFoundError(f"Could not execute {exe}: {exc}") from exc
+    except OSError as exc:  # e.g. permission denied or not a valid executable
+        raise HarnessError(f"Could not execute {exe}: {exc}") from exc
     except subprocess.TimeoutExpired as exc:
         raise CommandTimeoutError(f"Timed out after {timeout_s}s: {' '.join(command)}") from exc
     return CommandResult(

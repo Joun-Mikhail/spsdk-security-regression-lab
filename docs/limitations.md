@@ -20,6 +20,9 @@ results with that scope in mind.
   locally, plus the GitHub Actions `ubuntu-latest` runner with Python 3.12. The code uses
   `pathlib` and looks for `nxpcrypto.exe` on Windows, but **Windows has not been executed** as
   part of this delivery.
+- **SPSDK debug log.** `nxpcrypto` writes its own debug log to the user's state directory (for
+  example `~/.local/state/spsdk/3.13.0/log/debug.log` on Linux), outside the repository. A review
+  of that log after a full run found no key material, only file paths and error tracebacks.
 - **Output-text dependency.** SPSDK 3.13.0 signals an invalid signature only through stdout text,
   with exit code 0. The classifier therefore matches two exact lines. A future SPSDK version that
   rewords them would cause tests to fail with `ERROR`. That is safe (no false passes) but needs
