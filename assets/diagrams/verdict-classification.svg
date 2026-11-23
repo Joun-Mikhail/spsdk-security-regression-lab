@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="600" viewBox="0 0 1240 600" role="img" aria-labelledby="t d">
+  <title id="t">Verdict classification for nxpcrypto signature verify</title>
+  <desc id="d">Flowchart of classify_signature_verify in diagnostics.py. A non-zero exit code is ERROR. With exit code 0, the exact line "Signature IS matching the public key." gives ACCEPTED and the exact line "Signature IS NOT matching the public key." gives REJECTED. Any other output gives ERROR. A negative test passes only on REJECTED. ACCEPTED is reported as a security failure and ERROR as a setup or harness failure, so errors can never count as a successful rejection.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8ba3c7"/>
+    </marker>
+  </defs>
+  <style>
+    .h{font:700 13px 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:2.5px;fill:#4da3ff}
+    .ti{font:600 21px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#e6edf3}
+    .sub{font:400 14px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#9fb0c8}
+    .bt{font:600 15px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#e6edf3}
+    .bs{font:400 12.5px 'Segoe UI',Helvetica,Arial,sans-serif;fill:#9fb0c8}
+    .mono{font:500 12px 'SFMono-Regular',Consolas,'DejaVu Sans Mono',monospace;fill:#c9d4e5}
+    .ms{font:500 11px 'SFMono-Regular',Consolas,'DejaVu Sans Mono',monospace;fill:#8ba3c7}
+    .v{font:800 17px 'SFMono-Regular',Consolas,'DejaVu Sans Mono',monospace;letter-spacing:1px}
+    .lab{font:700 10.5px 'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:1.8px;fill:#8ba3c7}
+    .ln{stroke:#8ba3c7;stroke-width:1.6;fill:none}
+  </style>
+
+  <rect width="1240" height="600" rx="14" fill="#0b1220"/>
+
+  <text x="40" y="44" class="h">KEY FINDING · VERDICT CLASSIFICATION</text>
+  <text x="40" y="76" class="ti">Exit code 0 is not proof that a signature is valid</text>
+  <text x="40" y="102" class="sub">Observed in SPSDK 3.13.0: signature verify exits 0 for valid and for invalid signatures. Only stdout carries the verdict.</text>
+  <text x="40" y="122" class="sub">So the harness classifies the text, and treats anything unexpected as ERROR. Version-specific behaviour, not a reported vulnerability.</text>
+
+  <!-- column labels -->
+  <text x="40" y="168" class="lab">CLI RESULT</text>
+  <text x="270" y="168" class="lab">CHECKS · classify_signature_verify()</text>
+  <text x="742" y="168" class="lab">VERDICT</text>
+  <text x="972" y="168" class="lab">NEGATIVE TEST EXPECTS REJECTED</text>
+
+  <!-- input -->
+  <rect x="40" y="286" width="190" height="92" rx="10" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="56" y="316" class="bt">CommandResult</text>
+  <text x="56" y="338" class="ms">signature verify</text>
+  <text x="56" y="358" class="ms">returncode · stdout</text>
+
+  <!-- diamond 1 -->
+  <polygon points="360,262 450,332 360,402 270,332" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="360" y="328" class="bt" text-anchor="middle">exit code</text>
+  <text x="360" y="348" class="bt" text-anchor="middle">== 0 ?</text>
+
+  <!-- diamond 2 -->
+  <polygon points="590,252 690,332 590,412 490,332" fill="#0f1d33" stroke="#4da3ff" stroke-width="1.6"/>
+  <text x="590" y="318" class="bt" text-anchor="middle">exactly one</text>
+  <text x="590" y="338" class="bt" text-anchor="middle">verdict line</text>
+  <text x="590" y="358" class="bt" text-anchor="middle">in stdout?</text>
+
+  <!-- verdict boxes -->
+  <rect x="742" y="186" width="200" height="92" rx="10" fill="#0f2e22" stroke="#3fd47f" stroke-width="1.8"/>
+  <text x="842" y="220" class="v" fill="#3fd47f" text-anchor="middle">ACCEPTED</text>
+  <text x="842" y="244" class="ms" text-anchor="middle">"Signature IS matching</text>
+  <text x="842" y="260" class="ms" text-anchor="middle">the public key."</text>
+
+  <rect x="742" y="300" width="200" height="92" rx="10" fill="#341618" stroke="#ff6b6b" stroke-width="1.8"/>
+  <text x="842" y="334" class="v" fill="#ff6b6b" text-anchor="middle">REJECTED</text>
+  <text x="842" y="358" class="ms" text-anchor="middle">"Signature IS NOT matching</text>
+  <text x="842" y="374" class="ms" text-anchor="middle">the public key."</text>
+
+  <rect x="742" y="440" width="200" height="92" rx="10" fill="#33270e" stroke="#f5b942" stroke-width="1.8"/>
+  <text x="842" y="474" class="v" fill="#f5b942" text-anchor="middle">ERROR</text>
+  <text x="842" y="498" class="ms" text-anchor="middle">usage error, crash,</text>
+  <text x="842" y="514" class="ms" text-anchor="middle">missing or both lines</text>
+
+  <!-- outcomes -->
+  <rect x="972" y="196" width="228" height="72" rx="10" fill="#1a1215" stroke="#ff6b6b" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="988" y="225" class="bt" fill="#ff8585">FAIL</text>
+  <text x="1030" y="225" class="bs">security failure:</text>
+  <text x="988" y="247" class="bs">invalid input was accepted</text>
+
+  <rect x="972" y="310" width="228" height="72" rx="10" fill="#0f2e22" stroke="#3fd47f" stroke-width="1.4"/>
+  <text x="988" y="339" class="bt" fill="#56e39a">PASS</text>
+  <text x="1032" y="339" class="bs">rejection proven:</text>
+  <text x="988" y="361" class="bs">the check ran and said no</text>
+
+  <rect x="972" y="450" width="228" height="72" rx="10" fill="#1d170b" stroke="#f5b942" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="988" y="479" class="bt" fill="#ffd166">FAIL</text>
+  <text x="1030" y="479" class="bs">setup / harness failure:</text>
+  <text x="988" y="501" class="bs">never counted as a rejection</text>
+
+  <!-- arrows -->
+  <path d="M230 332 H266" class="ln" marker-end="url(#a)"/>
+  <path d="M450 332 H486" class="ln" marker-end="url(#a)"/>
+  <text x="460" y="322" class="ms">yes</text>
+  <path d="M360 402 V486 H738" class="ln" marker-end="url(#a)"/>
+  <text x="372" y="440" class="ms">no (e.g. exit 2: usage error)</text>
+  <path d="M640 292 C690 250 700 232 738 232" class="ln" marker-end="url(#a)"/>
+  <text x="676" y="246" class="ms">IS</text>
+  <path d="M690 332 C710 336 720 346 738 346" class="ln" marker-end="url(#a)"/>
+  <text x="694" y="326" class="ms">IS NOT</text>
+  <path d="M640 372 C690 420 700 470 738 476" class="ln" marker-end="url(#a)"/>
+  <text x="602" y="440" class="ms">neither / both</text>
+  <path d="M942 232 H968" class="ln" marker-end="url(#a)"/>
+  <path d="M942 346 H968" class="ln" marker-end="url(#a)"/>
+  <path d="M942 486 H968" class="ln" marker-end="url(#a)"/>
+
+  <text x="40" y="572" class="ms">Source: src/spsdk_regression/diagnostics.py · Guard test: test_harness_never_counts_usage_errors_as_rejections · Positive control runs before every negative signature test</text>
+</svg>

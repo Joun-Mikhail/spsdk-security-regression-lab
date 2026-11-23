@@ -1,0 +1,39 @@
+======================================= test session starts ========================================
+platform linux -- Python 3.12.3, pytest-9.2.0, pluggy-1.7.0 -- /home/user/spsdk-security-regression-lab/.venv/bin/python
+nxpcrypto: nxpcrypto, version 3.13.0 (suite verified against SPSDK 3.13.0)
+rootdir: /home/user/spsdk-security-regression-lab
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.14.8
+collecting ... collected 28 items
+
+tests/test_error_handling.py::test_crypto_010_malformed_private_key_is_refused[text] PASSED  [  3%]
+tests/test_error_handling.py::test_crypto_010_malformed_private_key_is_refused[empty-file] PASSED [  7%]
+tests/test_error_handling.py::test_crypto_010_malformed_private_key_is_refused[bad-pem-body] PASSED [ 10%]
+tests/test_error_handling.py::test_crypto_011_missing_firmware_sign_fails_without_artifact PASSED [ 14%]
+tests/test_error_handling.py::test_crypto_011_missing_firmware_digest_fails PASSED           [ 17%]
+tests/test_error_handling.py::test_harness_never_counts_usage_errors_as_rejections PASSED    [ 21%]
+tests/test_hashing.py::test_crypto_008_sha256_matches_hashlib[0B] PASSED                     [ 25%]
+tests/test_hashing.py::test_crypto_008_sha256_matches_hashlib[1B] PASSED                     [ 28%]
+tests/test_hashing.py::test_crypto_008_sha256_matches_hashlib[256B] PASSED                   [ 32%]
+tests/test_hashing.py::test_crypto_008_sha256_matches_hashlib[4096B] PASSED                  [ 35%]
+tests/test_hashing.py::test_crypto_009_wrong_reference_digest_is_detected[first-char] PASSED [ 39%]
+tests/test_hashing.py::test_crypto_009_wrong_reference_digest_is_detected[last-char] PASSED  [ 42%]
+tests/test_key_generation.py::test_crypto_001_generated_p256_keypair_is_valid_and_matching PASSED [ 46%]
+tests/test_key_generation.py::test_crypto_001b_two_generated_keys_are_distinct PASSED        [ 50%]
+tests/test_signatures.py::test_crypto_002_signing_produces_valid_der_signature[1B] PASSED    [ 53%]
+tests/test_signatures.py::test_crypto_002_signing_produces_valid_der_signature[256B] PASSED  [ 57%]
+tests/test_signatures.py::test_crypto_002_signing_produces_valid_der_signature[4096B] PASSED [ 60%]
+tests/test_signatures.py::test_crypto_003_valid_signature_is_accepted PASSED                 [ 64%]
+tests/test_signatures.py::test_crypto_004_tampered_firmware_is_rejected[first] PASSED        [ 67%]
+tests/test_signatures.py::test_crypto_004_tampered_firmware_is_rejected[middle] PASSED       [ 71%]
+tests/test_signatures.py::test_crypto_004_tampered_firmware_is_rejected[last] PASSED         [ 75%]
+tests/test_signatures.py::test_crypto_005_wrong_public_key_is_rejected PASSED                [ 78%]
+tests/test_signatures.py::test_crypto_006_corrupted_signature_is_rejected[last-byte] PASSED  [ 82%]
+tests/test_signatures.py::test_crypto_006_corrupted_signature_is_rejected[inside-s] PASSED   [ 85%]
+tests/test_signatures.py::test_crypto_007_truncated_signature_is_rejected PASSED             [ 89%]
+tests/test_signatures.py::test_crypto_012_independent_oracle_agrees_with_spsdk PASSED        [ 92%]
+tests/test_signatures.py::test_empty_firmware_round_trip PASSED                              [ 96%]
+tests/test_signatures.py::test_paths_with_spaces_and_unicode PASSED                          [100%]
+
+======================================= 28 passed in 25.14s ========================================
