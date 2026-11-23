@@ -1,0 +1,13 @@
+SPSDK Security Regression Demonstration
+
+[1] Generating ECC P-256 (secp256r1) test keys with nxpcrypto...
+[2] Creating 4 KiB synthetic firmware image...
+[3] Signing firmware (ECDSA, SHA-256, DER)...
+    signature: 70 bytes
+[4] Verifying original firmware with SPSDK... ACCEPTED
+[5] Modifying one byte of the firmware (offset 0x100)...
+[6] Verifying modified firmware with SPSDK... REJECTED
+[7] Independent check (Python cryptography): original=ACCEPTED, modified=REJECTED
+
+Temporary keys and files removed.
+Result: valid signature accepted; tampered firmware rejected.
