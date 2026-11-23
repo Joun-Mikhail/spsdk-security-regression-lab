@@ -1,0 +1,30 @@
+(.venv) PS C:\Users\jhash\spsdk-security-regression-lab> python -m pytest
+================================================= test session starts =================================================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+nxpcrypto: nxpcrypto, version 3.13.0 (suite verified against SPSDK 3.13.0)
+rootdir: C:\Users\jhash\spsdk-security-regression-lab
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.14.8
+collected 28 items
+
+tests\test_error_handling.py ......                                                                              [ 21%]
+tests\test_hashing.py ......                                                                                     [ 42%]
+tests\test_key_generation.py ..                                                                                  [ 50%]
+tests\test_signatures.py ..............                                                                          [100%]
+
+============================================ 28 passed in 63.12s (0:01:03) ============================================
+(.venv) PS C:\Users\jhash\spsdk-security-regression-lab> python scripts\demo.py
+SPSDK Security Regression Demonstration
+
+[1] Generating ECC P-256 (secp256r1) test keys with nxpcrypto...
+[2] Creating 4 KiB synthetic firmware image...
+[3] Signing firmware (ECDSA, SHA-256, DER)...
+    signature: 72 bytes
+[4] Verifying original firmware with SPSDK... ACCEPTED
+[5] Modifying one byte of the firmware (offset 0x100)...
+[6] Verifying modified firmware with SPSDK... REJECTED
+[7] Independent check (Python cryptography): original=ACCEPTED, modified=REJECTED
+
+Temporary keys and files removed.
+Result: valid signature accepted; tampered firmware rejected.

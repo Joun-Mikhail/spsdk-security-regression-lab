@@ -1,0 +1,27 @@
+$ python -m pytest -m negative -v -p no:cacheprovider
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.2.0, pluggy-1.7.0 -- ~/spsdk-security-regression-lab/.venv/bin/python
+nxpcrypto: nxpcrypto, version 3.13.0 (suite verified against SPSDK 3.13.0)
+rootdir: ~/spsdk-security-regression-lab
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.14.8
+collecting ... collected 28 items / 13 deselected / 15 selected
+
+tests/test_error_handling.py::test_crypto_010_malformed_private_key_is_refused[text] PASSED [  6%]
+tests/test_error_handling.py::test_crypto_010_malformed_private_key_is_refused[empty-file] PASSED [ 13%]
+tests/test_error_handling.py::test_crypto_010_malformed_private_key_is_refused[bad-pem-body] PASSED [ 20%]
+tests/test_error_handling.py::test_crypto_011_missing_firmware_sign_fails_without_artifact PASSED [ 26%]
+tests/test_error_handling.py::test_crypto_011_missing_firmware_digest_fails PASSED [ 33%]
+tests/test_error_handling.py::test_harness_never_counts_usage_errors_as_rejections PASSED [ 40%]
+tests/test_hashing.py::test_crypto_009_wrong_reference_digest_is_detected[first-char] PASSED [ 46%]
+tests/test_hashing.py::test_crypto_009_wrong_reference_digest_is_detected[last-char] PASSED [ 53%]
+tests/test_signatures.py::test_crypto_004_tampered_firmware_is_rejected[first] PASSED [ 60%]
+tests/test_signatures.py::test_crypto_004_tampered_firmware_is_rejected[middle] PASSED [ 66%]
+tests/test_signatures.py::test_crypto_004_tampered_firmware_is_rejected[last] PASSED [ 73%]
+tests/test_signatures.py::test_crypto_005_wrong_public_key_is_rejected PASSED [ 80%]
+tests/test_signatures.py::test_crypto_006_corrupted_signature_is_rejected[last-byte] PASSED [ 86%]
+tests/test_signatures.py::test_crypto_006_corrupted_signature_is_rejected[inside-s] PASSED [ 93%]
+tests/test_signatures.py::test_crypto_007_truncated_signature_is_rejected PASSED [100%]
+
+====================== 15 passed, 13 deselected in 17.51s ======================

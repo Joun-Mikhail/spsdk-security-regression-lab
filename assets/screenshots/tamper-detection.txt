@@ -1,0 +1,15 @@
+$ nxpcrypto key generate -k secp256r1 -o key.pem
+The key pair has been created: key.pub, key.pem
+$ python -c "import os; open('firmware.bin','wb').write(os.urandom(4096))"
+$ nxpcrypto signature create -s key.pem -a sha256 -e der -i firmware.bin -o firmware.der
+WARNING:spsdk.crypto.signature_provider:Signature has unexpected length: 70. Expected length: 64 (212ms since start, signature_provider.py:130)
+The data have been signed. Signature saved to: firmware.der
+
+$ nxpcrypto signature verify -k key.pub -a sha256 -i firmware.bin -s firmware.der
+Signature IS matching the public key.
+exit code: 0
+
+$ python -c "d=bytearray(open('firmware.bin','rb').read()); d[256]^=0x01; open('tampered.bin','wb').write(d)"
+$ nxpcrypto signature verify -k key.pub -a sha256 -i tampered.bin -s firmware.der
+Signature IS NOT matching the public key.
+exit code: 0

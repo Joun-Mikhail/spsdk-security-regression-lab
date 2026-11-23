@@ -1,0 +1,12 @@
+$ nxpcrypto digest -h sha256 -i firmware.bin
+SHA256(firmware.bin)= 7aa1f4326cf23d0764277afe67ee8cf34e75749c6167449412e004fdb3e1ca69
+
+$ nxpcrypto digest -h sha256 -i firmware.bin -c 7aa1f4326cf23d0764277afe67ee8cf34e75749c6167449412e004fdb3e1ca69
+SHA256(firmware.bin)= 7aa1f4326cf23d0764277afe67ee8cf34e75749c6167449412e004fdb3e1ca69
+Digests are the same.
+exit code: 0
+
+$ nxpcrypto digest -h sha256 -i firmware.bin -c 0aa1f4326cf23d0764277afe67ee8cf34e75749c6167449412e004fdb3e1ca69
+SHA256(firmware.bin)= 7aa1f4326cf23d0764277afe67ee8cf34e75749c6167449412e004fdb3e1ca69
+SPSDKAppError: Digests differ!
+exit code: 1
