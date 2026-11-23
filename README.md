@@ -34,7 +34,7 @@ re-checks them automatically on every change.
 - **Safe CLI runner.** It uses argument lists (never `shell=True`), applies timeouts, captures
   stdout, stderr and the exit code, and prints readable diagnostics. No key material is ever
   logged.
-- **Demo script** showing tamper detection in about 10 seconds.
+- **Demo script** showing tamper detection end to end in a few seconds.
 - **GitHub Actions CI** running Ruff and pytest, with a JUnit report uploaded as an artifact.
 
 ### A finding worth knowing about
@@ -80,13 +80,14 @@ More detail is in [docs/architecture.md](docs/architecture.md).
 | CRYPTO-012 | Independent verification of an SPSDK signature | Original verifies, modified data does not | `test_signatures.py` |
 | Extra | Empty firmware, paths with spaces and Unicode, harness self-check | See [docs/test_plan.md](docs/test_plan.md) | |
 
-These 12 scenarios expand into 28 pytest test cases through a small amount of parametrization.
+The 12 scenarios plus 3 extra checks expand into 28 pytest test cases through a small amount of
+parametrization.
 
 ## Quick start
 
 Requires Python 3.12. No hardware, accounts or secrets are needed.
 
-**Linux / macOS**
+**Linux** (verified; macOS should work the same way but is untested)
 
 ```bash
 git clone https://github.com/Joun-Mikhail/spsdk-security-regression-lab.git
@@ -97,7 +98,8 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
 
-**Windows PowerShell**
+**Windows PowerShell** (written for Windows but not yet executed there; see
+[limitations](docs/limitations.md))
 
 ```powershell
 git clone https://github.com/Joun-Mikhail/spsdk-security-regression-lab.git
@@ -107,6 +109,9 @@ py -3.12 -m venv .venv
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
+
+If PowerShell refuses to run `Activate.ps1`, allow it for the current session only with
+`Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned`.
 
 ## Running the tests
 
@@ -148,7 +153,7 @@ collected 28 items
 ============================= 28 passed in 23.29s ==============================
 ```
 
-The DER signature length varies between 70 and 72 bytes because ECDSA signatures are randomized.
+The DER signature length varies (typically 70-72 bytes) because ECDSA signatures are randomized.
 SPSDK also logs a harmless `Signature has unexpected length` warning when DER encoding is chosen.
 
 ### Regression-detection check
